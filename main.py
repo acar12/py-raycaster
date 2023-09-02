@@ -2,6 +2,7 @@ import math
 import pygame
 import grid
 from player import Player
+import math_util as util
 pygame.init()
 
 # constants
@@ -14,15 +15,25 @@ dist_to_projection = (width / 2) / math.tan(fov / 2)
 screen = pygame.display.set_mode((width, height))
 pygame.display.set_caption("Raycaster")
 
-wall = pygame.image.load("textures/wall.png")
-
+# bitmap textures
+wall = [
+    [1,0,1,0,1,0,1,0],
+    [0,1,0,1,0,1,0,1],
+    [1,0,1,0,1,0,1,0],
+    [0,1,0,1,0,1,0,1],
+    [1,0,1,0,1,0,1,0],
+    [0,1,0,1,0,1,0,1],
+    [1,0,1,0,1,0,1,0],
+    [0,1,0,1,0,1,0,1]
+]
+colors = [(65, 65, 165), (255, 255, 255)]
 # game set-up
 grid = grid.Raycaster([
     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
     [1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
     [1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
     [1, 0, 1, 1, 0, 0, 0, 0, 0, 1],
-    [1, 0, 1, 1, 0, 0, 0, 0, 0, 1],
+    [1, 0, 1, 1, 0, 0, 1, 0, 0, 1],
     [1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
     [1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
     [1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
@@ -36,32 +47,33 @@ player = Player(
     grid
 )
 
+def draw_slice(screen, texture, tx, x, y, w, h, c_mod=1):
+    cell_size = h / len(texture)
+    for row in range(len(texture)):
+        v = texture[row][int(tx)]
+        pygame.draw.rect(screen, tuple(map(lambda x: x * c_mod, colors[v])), 
+                            (x, y + row * cell_size, w, cell_size))
+
 def draw():
     buff = []
-    slice_width = 1
+    slice_width = 4
     for i in range(0, width, slice_width):
         rel_ang = (i / width - 0.5) * fov
         angle = rel_ang + player.rot
         raycast = grid.raycast(*player.pos, angle)
         if raycast:
-            col, dist, tile = raycast
+            col, dist, tile, vertical = raycast
             if tile > 0:
                 if dist != 0:
                     dist *= math.cos(rel_ang)
                     dist = abs(dist)
-
+                
                     draw_height = wall_height / dist * dist_to_projection
                     top = (height - draw_height) // 2
-                    c = 80 + 175 * ((max_dist - dist) / max_dist) ** 3
-                    pygame.draw.rect(screen, (c,c,c), (i, top, slice_width, draw_height))
-                    pygame.draw.rect(screen, (0, 0, 0), (i, top + draw_height, slice_width, height - top - draw_height))
-                    # slice = pygame.transform.scale(wall, (320, draw_height))
-                    # if col[0] % 1 != 0:
-                    #     tx = col[0] % 1 * 320
-                    #     screen.blit(slice, (i, top), (tx, 0, slice_width, draw_height))
-                    # else:
-                    #     tx = col[1] % 1 * 320
-                    #     screen.blit(slice, (i, top), (tx, 0, slice_width, draw_height))
+                    c = ((max_dist - dist) / max_dist) ** 2
+                    # bitmap texturing for walls
+                    tx = (col[1] if vertical else col[0]) % 1 * len(wall[0])
+                    draw_slice(screen, wall, tx, i, top, slice_width, draw_height, c)
             buff.append(col)
 
     # mini-map
