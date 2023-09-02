@@ -2,6 +2,7 @@ import math
 
 next_num = lambda x: math.floor(x) + 1 - x
 prev_num = lambda x: x - 1 if x % 1 == 0 else math.floor(x)
+sign = lambda x: -1 if x < 0 else 1
 
 def x_step(px, dir):
     if math.cos(dir) > 0:
@@ -17,10 +18,12 @@ def y_step(py, dir):
 
 def complete_vec(dir, *, px=None, py=None):
     if px: # get py
-        scl = px / math.cos(dir)
+        cos = math.cos(dir)
+        scl = px / math.cos(dir) if cos != 0 else 0
         return scl * math.sin(dir)
     else: # get px
-        scl = py / math.sin(dir)
+        sin = math.sin(dir)
+        scl = py / sin if sin != 0 else 0
         return scl * math.cos(dir)
 
 def vec_add(a, b):
