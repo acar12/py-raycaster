@@ -32,7 +32,7 @@ class Raycaster:
         else:
             ray_len_y = (py - int(py)) * dist_to_y
 
-
+        vertical = False
         while True:
             if hit[0] < 0 or hit[1] < 0 \
                     or math.floor(hit[0]) > len(self.grid[0]) - 1 or math.floor(hit[1]) > len(self.grid) - 1:
@@ -41,13 +41,15 @@ class Raycaster:
             tile = self.grid[math.floor(hit[1])][math.floor(hit[0])]
             if tile > 0:
                 collision = util.vec_add(start, util.vec_scl(dir_x, dir_y, distance))
-                return collision, distance, tile
+                return collision, distance, tile, vertical
 
             if ray_len_x < ray_len_y:
+                vertical = True
                 hit[0] += step_x
                 distance = ray_len_x
                 ray_len_x += dist_to_x
             else:
+                vertical = False
                 hit[1] += step_y
                 distance = ray_len_y
                 ray_len_y += dist_to_y
