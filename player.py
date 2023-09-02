@@ -28,7 +28,6 @@ class Player:
         self.rot += x * self.rot_speed 
         self.rot %= math.pi * 2
         
-
     def move_forward(self, dist):
         move = util.vec_scl(math.cos(self.rot), math.sin(self.rot), dist)
         pos = util.vec_add(self.pos, move)
