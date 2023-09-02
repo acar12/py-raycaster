@@ -34,10 +34,14 @@ class Raycaster:
 
 
         while True:
-            tile = self.grid[int(hit[1])][int(hit[0])]
+            if hit[0] < 0 or hit[1] < 0 \
+                    or math.floor(hit[0]) > len(self.grid[0]) - 1 or math.floor(hit[1]) > len(self.grid) - 1:
+                return
+            
+            tile = self.grid[math.floor(hit[1])][math.floor(hit[0])]
             if tile > 0:
                 collision = util.vec_add(start, util.vec_scl(dir_x, dir_y, distance))
-                return collision, distance + 0.001, tile
+                return collision, distance, tile
 
             if ray_len_x < ray_len_y:
                 hit[0] += step_x
