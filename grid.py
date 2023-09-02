@@ -10,7 +10,7 @@ class Raycaster:
         returns collision, distance, tile id
         """
         start = (px, py)
-        hit = list(self.snap_to_grid(px, py, dir))
+        hit = [px, py]
         dir_x = math.cos(dir)
         dir_y = math.sin(dir)
 
@@ -23,7 +23,22 @@ class Raycaster:
         distance = 0
         ray_len_x, ray_len_y = 0, 0
 
+        if step_x > 0:
+            ray_len_x = (int(px) + 1 - px) * dist_to_x
+        else:
+            ray_len_x = (px - int(px)) * dist_to_x
+        if step_y > 0:
+            ray_len_y = (int(py) + 1 - py) * dist_to_y
+        else:
+            ray_len_y = (py - int(py)) * dist_to_y
+
+
         while True:
+            tile = self.grid[int(hit[1])][int(hit[0])]
+            if tile > 0:
+                collision = util.vec_add(start, util.vec_scl(dir_x, dir_y, distance))
+                return collision, distance + 0.001, tile
+
             if ray_len_x < ray_len_y:
                 hit[0] += step_x
                 distance = ray_len_x
@@ -32,22 +47,3 @@ class Raycaster:
                 hit[1] += step_y
                 distance = ray_len_y
                 ray_len_y += dist_to_y
-            
-            tile = self.grid[int(hit[1])][int(hit[0])]
-            if tile > 0:
-                collision = util.vec_add(start, (dir_x * distance, dir_y * distance))
-                return collision, distance, tile
-
-
-
-    def snap_to_grid(self, px, py, dir):
-        xa = util.x_step(px, dir)
-        ya = util.y_step(py, dir)
-
-        snap_to_x = xa, util.complete_vec(dir, px=xa)
-        snap_to_y = ya, util.complete_vec(dir, py=ya)
-        
-        if math.hypot(*snap_to_x) > math.hypot(*snap_to_y):
-            return util.vec_add((px, py), snap_to_y)
-        else:
-            return util.vec_add((px, py), snap_to_x)
