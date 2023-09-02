@@ -13,14 +13,18 @@ class Player:
     def process_key_input(self, keys):
         if keys [pygame.K_w]:
             self.move_forward(self.speed)
-        elif keys[pygame.K_s]:
+        if keys[pygame.K_s]:
             self.move_forward(-self.speed)
-        elif keys[pygame.K_a]:
+        if keys[pygame.K_a]:
             self.move_right(-self.speed)
-        elif keys[pygame.K_d]:
+        if keys[pygame.K_d]:
             self.move_right(self.speed)
+        if keys[pygame.K_LEFT]:
+            self.rotate(-10)
+        if keys[pygame.K_RIGHT]:
+            self.rotate(10)
 
-    def process_mouse_input(self, x, y):
+    def rotate(self, x):
         self.rot += x * self.rot_speed 
         self.rot %= math.pi * 2
         
