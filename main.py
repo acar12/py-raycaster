@@ -7,9 +7,9 @@ pygame.init()
 
 # constants
 width, height = 1024, 768
-fps = 40
+fps = 60
 fov = math.radians(60)
-wall_height = 0.8
+wall_height = 1
 dist_to_projection = (width / 2) / math.tan(fov / 2)
 
 screen = pygame.display.set_mode((width, height))
@@ -33,7 +33,7 @@ grid = grid.Raycaster([
 max_dist = math.sqrt(len(grid.grid) ** 2 + len(grid.grid[0]) ** 2)
 player = Player(
     2, 2, 0,
-    0.1, 0.1, 
+    10, 5, 
     grid
 )
 
@@ -83,6 +83,7 @@ def draw():
 timer = pygame.time.Clock()
 running = True
 locked = True
+secs = 1
 while running:
     # events
     for event in pygame.event.get():
@@ -93,13 +94,11 @@ while running:
         elif event.type == pygame.MOUSEBUTTONDOWN:
             locked = True
     # custom input processing
-    # pygame.event.set_grab(locked)
-    player.process_key_input(pygame.key.get_pressed())
-    # player.process_mouse_input(*pygame.mouse.get_rel())
+    player.process_key_input(pygame.key.get_pressed(), secs)
     # rendering
     screen.fill((0, 0, 0))
     draw()
     pygame.display.update()
     
     # end
-    timer.tick(fps)
+    secs = timer.tick(fps) / 1000
